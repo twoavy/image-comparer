@@ -1,22 +1,27 @@
 <template>
     <div class="image-comparer-container"
+         :class="`image-comparer-${orientation}`"
          :style="containerStyle"
-         @touchstart="startSlide"
-         @mousedown="startSlide">
+         @touchstart="containerClick"
+         @mousedown="containerClick">
         <img :src="after" alt="after"
              @mousedown.prevent
+             :style="imgStyle.after"
              @load="setDimensions"/>
         <img :src="before" alt="before"
              @mousedown.prevent
-             :style="beforeImgStyle"/>
+             :style="imgStyle.before"/>
         <div class="image-comparer-overlay">
             <div v-if="beforeLabel" class="image-comparer-before-label">{{ beforeLabel }}</div>
             <div v-if="afterLabel" class="image-comparer-after-label">{{ afterLabel }}</div>
         </div>
         <div class="image-comparer-handle bg-primary"
-             :style="handleStyle">
-            <div class="image-comparer-arrow-left"></div>
-            <div class="image-comparer-arrow-right"></div>
+             :class="`image-comparer-handle-${orientation}`"
+             :style="handleStyle"
+             @touchstart="startSlide"
+             @mousedown="startSlide">
+            <div :class="`image-comparer-arrow image-comparer-arrow-${beforeDirection}`"></div>
+            <div :class="`image-comparer-arrow image-comparer-arrow-${afterDirection}`"></div>
         </div>
     </div>
 </template>
@@ -24,15 +29,6 @@
 <script>
 export default {
     name: 'image-comparer',
-    data() {
-        return {
-            imgOffset: null,
-            slideOffset: this.offset,
-            sliding: false,
-            containerStyle: {},
-            overlayStyle: {}
-        }
-    },
     props: {
         before: {
             type: String,
@@ -52,15 +48,52 @@ export default {
             type: [String, Number],
             default: 0.5,
             validator: (value) => {
-                return (value > 0 && value <= 1)
+                return (value >= 0 && value <= 1)
             }
+        },
+        clickToMove: {
+            type: Boolean,
+            default: true
+        },
+        handleWidth: {
+            type: Number
+        },
+        handleHeight: {
+            type: Number
+        },
+        orientation: {
+            type: String,
+            default: 'horizontal',
+            validator: value => {
+                return (value === 'horizontal' || value === 'vertical')
+            }
+        }
+    },
+    data() {
+        return {
+            imgOffset: null,
+            slideOffset: { x: this.offset, y: this.offset },
+            sliding: false,
+            containerStyle: {},
+            overlayStyle: {},
+            handle: {
+                width: this.handleWidth ? this.handleWidth : (this.orientation === 'horizontal' ? 60 : 30),
+                height: this.handleHeight ? this.handleHeight : (this.orientation === 'horizontal' ? 30 : 60)
+            },
+            beforeDirection: (this.orientation === 'vertical') ? 'down' : 'left',
+            afterDirection: (this.orientation === 'vertical') ? 'up' : 'right'
         }
     },
     methods: {
         setDimensions() {
             const img = this.$el.querySelector('img')
             this.imgOffset = img.getBoundingClientRect()
-            this.containerStyle = { width: `${this.w}px`, height: `${this.h}px` }
+            this.containerStyle = { width: `${this.calcOffset.w}px`, height: `${this.calcOffset.h}px` }
+        },
+        containerClick(event) {
+            if (this.clickToMove) {
+                this.startSlide(event)
+            }
         },
         startSlide(event) {
             this.sliding = true
@@ -69,8 +102,10 @@ export default {
         moveSlide(event) {
             if (this.sliding) {
                 let x = (event.touches ? event.touches[0].pageX : event.pageX) - this.imgOffset.left
-                x = (x < 0) ? 0 : ((x > this.w) ? this.w : x)
-                this.slideOffset = (x / this.w)
+                let y = (event.touches ? event.touches[0].pageY : event.pageY) - this.imgOffset.top
+                x = (x < 0) ? 0 : ((x > this.calcOffset.w) ? this.calcOffset.w : x) / this.calcOffset.w
+                y = (y < 0) ? 0 : ((y > this.calcOffset.h) ? this.calcOffset.h : y) / this.calcOffset.h
+                this.slideOffset = { x, y }
             }
         },
         endSlide() {
@@ -82,33 +117,38 @@ export default {
         }
     },
     computed: {
-        beforeImgStyle() {
-            return { clip: `rect(0, ${this.x}px, ${this.h}px, 0)` }
+        imgStyle() {
+            let after, before
+            if (this.orientation === 'horizontal') {
+                after = { clip: `rect(0, ${this.calcOffset.w}px, ${this.calcOffset.h}px, ${this.calcOffset.cw}px)` }
+                before = { clip: `rect(0, ${this.calcOffset.cw}px, ${this.calcOffset.h}px, 0)` }
+            } else {
+                after = { clip: `rect(${this.calcOffset.ch}px, ${this.calcOffset.w}px, ${this.calcOffset.h}px, 0)` }
+                before = { clip: `rect(0, ${this.calcOffset.w}px, ${this.calcOffset.ch}px, 0)` }
+            }
+            return { after, before }
         },
         handleStyle() {
-            const width = 60
-            const height = 30
+            let width = this.handle.width
+            let height = this.handle.height
+            const horizontal = this.orientation === 'horizontal'
             return {
                 width: `${width}px`,
                 height: `${height}px`,
-                top: `calc(50% - ${height / 2}px)`,
-                left: `calc(${this.slideOffset * 100}% - ${width / 2}px)`
+                top: horizontal ? `calc(50% - ${height / 2}px)` : `calc(${this.slideOffset.y * 100}% - ${height / 2}px)`,
+                left: horizontal ? `calc(${this.slideOffset.x * 100}% - ${width / 2}px)` : `calc(50% - ${width / 2}px)`
             }
         },
-        x() {
-            return this.w * this.slideOffset
-        },
-        w() {
+        calcOffset() {
+            let w = 0
+            let h = 0
             if (this.imgOffset) {
-                return this.imgOffset.width
+                w = this.imgOffset.width
+                h = this.imgOffset.height
             }
-            return null
-        },
-        h() {
-            if (this.imgOffset) {
-                return this.imgOffset.height
-            }
-            return null
+            let cw = this.slideOffset.x * w
+            let ch = this.slideOffset.y * h
+            return { w, h, cw, ch }
         }
     },
     mounted() {
@@ -181,43 +221,76 @@ export default {
             border-radius: 30%;
             user-select: none;
             display: flex;
-            padding: 0 5px;
             align-items: center;
             justify-content: space-between;
+
+            &.image-comparer-handle-horizontal {
+
+            }
+            &.image-comparer-handle-vertical {
+                flex-direction: column;
+            }
         }
 
         .image-comparer-handle:before, .image-comparer-handle:after {
             content: "";
             border: 2px solid white;
-            height: 9999px;
             position: absolute;
-            left: calc(50% - 5px);
             z-index: 29;
         }
 
-        .image-comparer-handle:before {
-            top: 100%;
+        &.image-comparer-horizontal {
+            .image-comparer-handle:before, .image-comparer-handle:after {
+                height: 9999px;
+                left: calc(50%);
+            }
+
+            .image-comparer-handle:before {
+                top: 100%;
+            }
+
+            .image-comparer-handle:after {
+                bottom: 100%;
+            }
+
+            .image-comparer-arrow-right {
+                border-color: transparent transparent transparent white;
+            }
+
+            .image-comparer-arrow-left {
+                border-color: transparent white transparent transparent;
+            }
         }
 
-        .image-comparer-handle:after {
-            bottom: 100%;
+        &.image-comparer-vertical {
+            .image-comparer-handle:before, .image-comparer-handle:after {
+                width: 9999px;
+                top: calc(50%);
+            }
+
+            .image-comparer-handle:before {
+                left: 100%;
+            }
+
+            .image-comparer-handle:after {
+                right: 100%;
+            }
+
+            .image-comparer-arrow-down {
+                border-color: transparent transparent white transparent;
+            }
+
+            .image-comparer-arrow-up {
+                border-color: white transparent transparent transparent;
+            }
         }
 
-        .image-comparer-arrow-right,
-        .image-comparer-arrow-left {
+        .image-comparer-arrow {
             user-select: none;
             position: relative;
             width: 0;
             height: 0;
-            border: 8px solid;
-        }
-
-        .image-comparer-arrow-right {
-            border-color: transparent transparent transparent white;
-        }
-
-        .image-comparer-arrow-left {
-            border-color: transparent white transparent transparent;
+            border: 8px inset transparent;
         }
     }
 </style>

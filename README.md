@@ -17,29 +17,16 @@ import ImageComparer from 'image-comparer';
 <image-comparer before="/img/before.png" after="/img/after.png" />
 ```
 
-## props
-```js
-{
-    before: {
-        type: String,
-        required: true
-    },
-    beforeLabel: {
-        type: String
-    },
-    after: {
-        type: String,
-        required: true
-    },
-    afterLabel: {
-        type: String
-    },
-    offset: {
-        type: [String, Number],
-        default: 0.5,
-        validator: (value) => {
-            return (value > 0 && value <= 1)
-        }
-    }
-}
-```
+## Props
+
+Name | Type | Default | Note
+:--- | :---: | :---: | ---
+before | string | required | upper/left image
+after | string | required | lower/right image
+afterLabel | string | |
+afterLabel | string | |
+offset | number | 0.5 | slider start pos
+clickToMove | boolean | true | move only on handle
+handleWidth | number | 60/30 | (horizontal/vertical)
+handleHeight | number | 30/60 | (horizontal/vertical)
+orientation | boolean | horizontal
