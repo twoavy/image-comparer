@@ -4,11 +4,11 @@ A Vue component for comparing 2 images with a slider
 
 ## Installation
 
-```js
+```bash
 npm i @zweiav/image-comparer --registry=http://192.168.179.162:4873
 ```
 ```js
-import ImageComparer from 'image-comparer';
+import ImageComparer from '@zweiav/image-comparer'
 ```
 
 ## Usage
@@ -17,7 +17,7 @@ import ImageComparer from 'image-comparer';
 <image-comparer before="/img/before.png" after="/img/after.png" />
 ```
 
-## Props
+### Props
 
 Name | Type | Default | Note
 :--- | :---: | :---: | ---
@@ -30,3 +30,12 @@ clickToMove | boolean | true | move only on handle
 handleWidth | number | 60/30 | (horizontal/vertical)
 handleHeight | number | 30/60 | (horizontal/vertical)
 orientation | boolean | horizontal
+
+### Events
+
+
+##### @update
+fired when slider moves. returns slider position
+```
+{ x: 0.2321, y: 0.9342 } // 0 <= value <= 1
+```

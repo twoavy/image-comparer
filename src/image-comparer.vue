@@ -106,6 +106,7 @@ export default {
                 x = (x < 0) ? 0 : ((x > this.calcOffset.w) ? this.calcOffset.w : x) / this.calcOffset.w
                 y = (y < 0) ? 0 : ((y > this.calcOffset.h) ? this.calcOffset.h : y) / this.calcOffset.h
                 this.slideOffset = { x, y }
+                this.$emit('update', this.slideOffset)
             }
         },
         endSlide() {
