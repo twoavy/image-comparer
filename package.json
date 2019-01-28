@@ -1,6 +1,6 @@
 {
   "name": "@zweiav/image-comparer",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Vue component for comparing 2 images with a slider",
   "author": "Julian Frank",
   "main": "dist/image-comparer.umd.js",
@@ -9,22 +9,17 @@
   "browser": {
     "./sfc": "src/image-comparer.vue"
   },
-
   "files": [
     "dist/*",
     "src/*"
   ],
-
   "scripts": {
     "build": "npm run build:unpkg & npm run build:es & npm run build:umd",
     "build:umd": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format umd --file dist/image-comparer.umd.js",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es --file dist/image-comparer.esm.js",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife --file dist/image-comparer.min.js"
   },
-
-  "dependencies": {
-  },
-
+  "dependencies": {},
   "devDependencies": {
     "cross-env": "^5.2.0",
     "minimist": "^1.2.0",
