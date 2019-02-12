@@ -101,7 +101,7 @@ export default {
         },
         moveSlide(event) {
             if (this.sliding) {
-                let x = (event.touches ? event.touches[0].pageX : event.pageX) - this.imgOffset.left
+                let x = (event.touches ? event.touches[0].pageX : event.pageX) - event.target.offsetParent.offsetLeft
                 let y = (event.touches ? event.touches[0].pageY : event.pageY) - this.imgOffset.top
                 x = (x < 0) ? 0 : ((x > this.calcOffset.w) ? this.calcOffset.w : x) / this.calcOffset.w
                 y = (y < 0) ? 0 : ((y > this.calcOffset.h) ? this.calcOffset.h : y) / this.calcOffset.h
@@ -174,9 +174,12 @@ export default {
         position: relative;
         overflow: hidden;
         box-sizing: content-box;
+        height: 100%;
+        width: 100%;
 
         img {
             max-width: 100%;
+            max-height: 100%;
             position: absolute;
             top: 0;
             left: 0;
@@ -292,6 +295,7 @@ export default {
             width: 0;
             height: 0;
             border: 8px inset transparent;
+            pointer-events: none;
         }
     }
 </style>
