@@ -101,8 +101,9 @@ export default {
         },
         moveSlide(event) {
             if (this.sliding) {
-                let x = (event.touches ? event.touches[0].pageX : event.pageX) - event.target.offsetParent.offsetLeft
-                let y = (event.touches ? event.touches[0].pageY : event.pageY) - this.imgOffset.top
+                let global = this.getGlobalCoords(event.target.offsetParent)
+                let x = (event.touches ? event.touches[0].pageX : event.pageX) - global.x
+                let y = (event.touches ? event.touches[0].pageY : event.pageY) - global.y
                 x = (x < 0) ? 0 : ((x > this.calcOffset.w) ? this.calcOffset.w : x) / this.calcOffset.w
                 y = (y < 0) ? 0 : ((y > this.calcOffset.h) ? this.calcOffset.h : y) / this.calcOffset.h
                 this.slideOffset = { x, y }
@@ -115,6 +116,14 @@ export default {
         resize() {
             this.containerStyle = {}
             this.$nextTick(() => this.setDimensions())
+        },
+        getGlobalCoords(element, x = 0, y = 0) {
+            x += element.offsetLeft
+            y += element.offsetTop
+            if (element.offsetParent) {
+                return this.getGlobalCoords(element.offsetParent, x, y)
+            }
+            return { x, y }
         }
     },
     computed: {
@@ -172,7 +181,6 @@ export default {
 <style lang="scss" scoped>
     .image-comparer-container {
         position: relative;
-        overflow: hidden;
         box-sizing: content-box;
         height: 100%;
         width: 100%;
@@ -231,6 +239,7 @@ export default {
             &.image-comparer-handle-horizontal {
 
             }
+
             &.image-comparer-handle-vertical {
                 flex-direction: column;
             }
