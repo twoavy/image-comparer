@@ -1,6 +1,6 @@
 {
   "name": "@zweiav/image-comparer",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A Vue component for comparing 2 images with a slider",
   "author": "Julian Frank",
   "main": "dist/image-comparer.umd.js",

@@ -267,7 +267,8 @@ export default {
             }
 
             .image-comparer-arrow-right {
-                border-color: transparent transparent transparent white;
+                border-color: transparent white transparent transparent;
+                transform: rotate(180deg);
             }
 
             .image-comparer-arrow-left {
@@ -294,7 +295,8 @@ export default {
             }
 
             .image-comparer-arrow-up {
-                border-color: white transparent transparent transparent;
+                border-color: transparent transparent white transparent;
+                transform: rotate(180deg);
             }
         }
 
