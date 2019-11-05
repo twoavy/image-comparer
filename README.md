@@ -5,10 +5,11 @@ A Vue component for comparing 2 images with a slider
 ## Installation
 
 ```bash
-npm i @zweiav/image-comparer --registry=http://192.168.179.162:4873
+yarn add @twoavy/image-comparer 
 ```
+
 ```js
-import ImageComparer from '@zweiav/image-comparer'
+import ImageComparer from '@twoavy/image-comparer'
 ```
 
 ## Usage

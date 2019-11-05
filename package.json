@@ -1,10 +1,10 @@
 {
   "name": "@twoavy/image-comparer",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A Vue component for comparing 2 images with a slider",
   "author": "Julian Frank",
   "repository": {
-    "type: "git",
+    "type": "git",
     "url": "https://github.com/twoavy/image-comparer.git"
   },
   "main": "dist/image-comparer.umd.js",
